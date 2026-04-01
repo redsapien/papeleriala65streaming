@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>En Papelería La 65 | Cine en Manizales</title>
+    
+    <style>
+        :root {
+            --n-red: #E50914;
+            --n-glow: rgba(229, 9, 20, 0.7);
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body, html {
+            background-color: #000;
+            color: white;
+            width: 100%;
+            overflow-x: hidden; /* Permite scroll vertical */
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+        }
+
+        /* --- FONDO CINEMATOGRÁFICO FIJO --- */
+        .video-master {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            z-index: 1;
+            pointer-events: none; /* Evita interferencias con el scroll */
+        }
+
+        video {
+            width: 100%; 
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.15);
+        }
+
+        .cinematic-vignette {
+            position: absolute;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            z-index: 2;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.7) 0%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(0,0,0,0.9) 100%);
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh; /* Ocupa al menos toda la pantalla */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- LOGO EN BURBUJA PERFECTA --- */
+        .brand-top {
+            position: relative;
+            top: 0;
+            margin: 45px auto 0;
+            z-index: 20;
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2), 0 10px 20px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            animation: fadeInDown 1s ease;
+        }
+
+        .brand-top img { 
+            width: 100%; 
+            height: auto; 
+            object-fit: contain;
+        }
+
+        /* --- INTERFAZ DE VENTA --- */
+        .sales-overlay {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: calc(100vh - 200px); /* Ajuste dinámico */
+            padding: 80px 20px 60px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 15px;
+            text-shadow: 0 5px 25px rgba(0,0,0,1);
+            padding: 0 15px;
+            display: inline-block;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 2.3rem;
+            background-color: var(--n-red);
+            box-shadow: 0 0 10px var(--n-glow);
+            margin-left: 6px;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+        }
+
+        p.pitch {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: #efefef;
+            max-width: 340px;
+            line-height: 1.6;
+            margin: 20px auto 40px;
+            text-shadow: 0 2px 12px rgba(0,0,0,1);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: 1s all cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding: 0 20px;
+        }
+
+        .pitch-show { 
+            opacity: 1 !important; 
+            transform: translateY(0) !important; 
+        }
+
+        /* --- BOTÓN CON VIBRACIÓN SUTIL --- */
+        .cta-wrapper {
+            opacity: 0;
+            transition: opacity 1s ease 0.5s;
+        }
+
+        .btn-neon {
+            position: relative;
+            display: inline-block;
+            padding: 18px 45px;
+            background: var(--n-red);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            border-radius: 4px;
+            box-shadow: 0 0 30px var(--n-glow);
+            overflow: hidden;
+            transition: 0.3s;
+            animation: soft-shake 4s infinite ease-in-out;
+        }
+
+        .btn-neon:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 50px var(--n-red);
+            animation-play-state: paused;
+        }
+
+        /* --- ESTILOS DE LA SECCIÓN BENEFICIOS --- */
+        .benefits-cinematic {
+            position: relative;
+            padding: 80px 20px 100px;
+            background: #050505;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            z-index: 10;
+        }
+
+        /* Efecto de luz de fondo sutil */
+        .section-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: var(--n-red);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h2.reveal-text {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 50px;
+            letter-spacing: -1px;
+            color: #fff;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        /* --- GRID RESPONSIVO --- */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+        }
+
+        /* --- TARJETAS TIPO CRISTAL (GLASSMORPHISM) --- */
+        .benefit-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .benefit-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--n-red);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+        }
+
+        .benefit-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .benefit-card p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Brillo que pasa por la tarjeta (Efecto Cine) */
+        .card-shimmer {
+            position: absolute;
+            top: 0; 
+            left: -100%;
+            width: 100%; 
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .benefit-card:hover .card-shimmer {
+            left: 100%;
+            transition: 0.8s;
+        }
+
+        /* --- CLASES DE ANIMACIÓN --- */
+        .is-visible {
+            opacity: 1 !important;
+            transform: translateY(0) scale(1) !important;
+        }
+
+        /* Animaciones */
+        @keyframes fadeInDown { 
+            from { opacity: 0; transform: translateY(-20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        @keyframes blink { 
+            50% { opacity: 0; } 
+        }
+        
+        @keyframes soft-shake {
+            0%, 90%, 100% { transform: translateX(0); }
+            92% { transform: translateX(2px); }
+            94% { transform: translateX(-2px); }
+            96% { transform: translateX(2px); }
+            98% { transform: translateX(-2px); }
+        }
+
+        @media (max-width: 768px) {
+            h2.reveal-text { 
+                font-size: 1.6rem; 
+            }
+            .benefit-card { 
+                padding: 30px 20px; 
+            }
+            .sales-overlay {
+                min-height: auto;
+                padding: 60px 20px 40px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .cursor {
+                height: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-master">
+        <video autoplay muted loop playsinline>
+            <source src="Videos/Fondo-Streaming.mp4" type="video/mp4">
+        </video>
+        <div class="cinematic-vignette"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="brand-top">
+            <img src="Imagenes/Logo-la-65.jpeg" alt="Papelería La 65">
+        </div>
+
+        <main class="sales-overlay">
+            <div>
+                <h1 id="typewriter-h1"></h1><span class="cursor" id="main-cursor"></span>
+            </div>
+            
+            <p class="pitch" id="sales-pitch">
+                En Papelería la 65 cuidamos tu parche con el mejor cine digital para que disfrutes en familia hoy mismo.
+            </p>
+
+            <div class="cta-wrapper" id="btn-reveal">
+                <a href="https://wa.me/573005879042?text=Hola%20deseo%20activar%20una%20cuenta%20👋" class="btn-neon" target="_blank">QUIERO MI ACCESO VIP</a>
+            </div>
+        </main>
+
+        <section class="benefits-cinematic" id="beneficios">
+            <div class="section-glow"></div>
+            
+            <div class="container">
+                <h2 class="reveal-text">¿Por qué elegir nuestro parche? 🍿</h2>
+                
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Activo en 5 Minutos</h3>
+                        <p>Sin esperas largas. Te enviamos el acceso volando para que no te pierdas ni un segundo de tu serie.</p>
+                        <div class="card-shimmer"></div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="card-icon">✅</div>
+                        <h3>100% Originales</h3>
+                        <p>Cuentas reales y estables. Nada de caídas raras; aquí la calidad se respeta como en Papelería La 65.</p>
+                        <div class="card-shimmer"></div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="card-icon">🎧</div>
+                        <h3>Soporte Todo el Mes</h3>
+                        <p>¿Alguna duda? Estamos pendientes de ti por WhatsApp todo el mes. Soporte rápido y muy humano.</p>
+                        <div class="card-shimmer"></div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="card-icon">🎬</div>
+                        <h3>Catálogo Infinito</h3>
+                        <p>Todo el cine, deportes y series en un solo lugar. El entretenimiento que Manizales se merece.</p>
+                        <div class="card-shimmer"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- MÁQUINA DE ESCRIBIR ---
+        const titleText = "Cine premium para nuestra gente de Manizales."; 
+        const h1Element = document.getElementById("typewriter-h1");
+        const cursor = document.getElementById("main-cursor");
+        let charIndex = 0;
+
+        function typeEffect() {
+            if (charIndex < titleText.length) {
+                h1Element.innerHTML += titleText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeEffect, 65);
+            } else {
+                if (cursor) cursor.style.display = 'none';
+                const pitch = document.getElementById("sales-pitch");
+                if (pitch) pitch.classList.add("pitch-show");
+                const btnReveal = document.getElementById("btn-reveal");
+                if (btnReveal) btnReveal.style.opacity = '1';
+            }
+        }
+
+        // Iniciar efecto cuando todo esté cargado
+        window.addEventListener('load', () => {
+            setTimeout(typeEffect, 1200);
+        });
+
+        // --- EFECTO DE APARICIÓN AL HACER SCROLL ---
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: "0px 0px -50px 0px" // Mejora la detección
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Animar el título
+                    if (entry.target.classList.contains('reveal-text')) {
+                        entry.target.classList.add('is-visible');
+                    }
+                    // Animar tarjetas
+                    if (entry.target.classList.contains('benefit-card')) {
+                        const delay = entry.target.dataset.delay || 0;
+                        setTimeout(() => {
+                            entry.target.classList.add('is-visible');
+                        }, delay);
+                    }
+                    // Una vez animado, dejar de observar para mejor rendimiento
+                    if (entry.target.classList.contains('reveal-text') || entry.target.classList.contains('benefit-card')) {
+                        observer.unobserve(entry.target);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Inicializar observadores cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            const title = document.querySelector('.reveal-text');
+            if (title) observer.observe(title);
+
+            const cards = document.querySelectorAll('.benefit-card');
+            cards.forEach((card, index) => {
+                card.dataset.delay = index * 150; // 150ms entre cada tarjeta
+                observer.observe(card);
+            });
+        });
+    </script>
+        <section class="pricing-catalog" id="precios">
+        <canvas id="particles-canvas"></canvas>
+        
+        <div class="container">
+            <h2 class="reveal-text main-title">Combos del Mes en Manizales 🔥</h2>
+            <p class="subtitle">Seleccionados para los que saben de buen cine.</p>
+
+            <div class="pricing-grid">
+                <div class="price-card combo-5">
+                    <div class="card-header">
+                        <span class="badge">EL MÁS POPULAR</span>
+                        <h3>Combo #1</h3>
+                    </div>
+                    <div class="platforms">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix" class="plat-logo">
+                        <span class="plus">+</span>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Paramount_Plus.svg" alt="Paramount" class="plat-logo">
+                    </div>
+                    <div class="price-tag">
+                        <span class="currency">$</span>17.000
+                    </div>
+                    <ul class="features">
+                        <li>Acceso Inmediato</li>
+                        <li>Calidad 4K / Ultra HD</li>
+                        <li>Garantía de 30 días</li>
+                    </ul>
+                    <a href="https://wa.me/573005879042?text=Hola%20deseo%20activar%20una%20cuenta%20👋" class="btn-buy" target="_blank">LO QUIERO YA</a>
+                </div>
+
+                <div class="price-card combo-7">
+                    <div class="card-header">
+                        <span class="badge secondary">ECONOMY PLUS</span>
+                        <h3>Combo #2</h3>
+                    </div>
+                    <div class="platforms">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg" alt="Prime Video" class="plat-logo">
+                        <span class="plus">+</span>
+                        <div class="hbo-logo-css">
+                            <span class="hbo-text">HBO</span>
+                            <span class="max-text">max</span>
+                        </div>
+                    </div>
+                    <div class="price-tag">
+                        <span class="currency">$</span>12.000
+                    </div>
+                    <ul class="features">
+                        <li>Multidispositivo</li>
+                        <li>Sin interrupciones</li>
+                        <li>Soporte VIP 24/7</li>
+                    </ul>
+                    <a href="https://wa.me/573005879042?text=Hola%20deseo%20activar%20una%20cuenta%20👋" class="btn-buy" target="_blank">LO QUIERO YA</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        /* --- LOGO HBO CSS --- */
+        .hbo-logo-css {
+            display: flex;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            font-weight: 900;
+            color: white;
+            letter-spacing: -1px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+        }
+        .hbo-text {
+            font-size: 22px;
+            position: relative;
+            padding-right: 2px;
+        }
+        /* El círculo icónico de la 'O' de HBO */
+        .hbo-text::after {
+            content: "";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            background: black;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .max-text {
+            font-size: 16px;
+            font-weight: 400;
+            margin-left: 2px;
+            margin-bottom: -4px;
+            background: linear-gradient(to right, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- RESTO DE ESTILOS --- */
+        .pricing-catalog {
+            background: #000;
+            padding: 20px 20px 80px 20px; 
+            position: relative;
+            overflow: hidden;
+            margin-top: -2px;
+        }
+
+        #particles-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .pricing-catalog .container { position: relative; z-index: 2; }
+
+        .main-title {
+            font-size: 2.8rem !important; 
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 15px;
+            text-align: center;
+            color: white;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 50px;
+            font-weight: 300;
+            font-size: 1.1rem;
+        }
+
+        .pricing-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .price-card {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 380px;
+            transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            text-align: center;
+        }
+
+        .price-card:hover {
+            transform: translateY(-15px);
+            border-color: #e50914;
+            box-shadow: 0 30px 60px rgba(229, 9, 20, 0.25);
+        }
+
+        .badge {
+            background: #e50914;
+            font-size: 0.7rem;
+            padding: 6px 14px;
+            border-radius: 50px;
+            letter-spacing: 1px;
+            font-weight: 800;
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.5);
+        }
+
+        .badge.secondary { background: #333; box-shadow: none; }
+
+        .platforms {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            min-height: 40px;
+        }
+
+        .plat-logo { height: 32px; width: auto; filter: drop-shadow(0 0 8px rgba(255,255,255,0.3)); }
+        .plus { font-size: 1.5rem; font-weight: 300; color: #666; }
+
+        .price-tag {
+            font-size: 4.2rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: #fff;
+            letter-spacing: -2px;
+        }
+
+        .currency { font-size: 1.6rem; vertical-align: super; margin-right: 5px; color: #e50914; }
+
+        .features {
+            list-style: none;
+            margin-bottom: 35px;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .features li {
+            margin-bottom: 12px;
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+
+        .features li::before { content: "✓"; color: #e50914; font-weight: bold; margin-right: 10px; }
+
+        .btn-buy {
+            display: block;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s ease;
+        }
+
+        .btn-buy:hover { 
+            background: #e50914; 
+            color: #fff; 
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .main-title { font-size: 2rem !important; }
+            .price-tag { font-size: 3.5rem; }
+        }
+    </style>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            if(!canvas) return;
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(229, 9, 20, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function createParticles() {
+            particles = [];
+            const numberOfParticles = (canvas.width * canvas.height) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => { initCanvas(); createParticles(); });
+        initCanvas();
+        createParticles();
+        animateParticles();
+    </script>
+
+<footer class="main-footer">
+    <div class="footer-glow"></div>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo-footer">📍</div>
+                <h4>Papelería La 65</h4>
+                <p>El parche del entretenimiento en Manizales.</p>
+            </div>
+            
+            <div class="footer-info">
+                <div class="info-item">
+                    <span>📍</span>
+                    <p>Fátima, Manizales, Caldas</p>
+                </div>
+                <div class="info-item">
+                    <span>📞</span>
+                    <p>305 7261290</p>
+                </div>
+                <div class="info-item">
+                    <span>📧</span>
+                    <p>papeleriala65@tuta.io</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Papelería La 65 - Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<a href="https://wa.me/573005879042?text=Hola%20deseo%20activar%20una%20cuenta%20👋" class="whatsapp-float" id="waButton" target="_blank">
+    <div class="wa-badge" id="waCounter">1</div>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    <span class="wa-tooltip">¡Estamos en línea! 🍿</span>
+</a>
+
+<style>
+    /* --- ESTILOS FOOTER --- */
+    .main-footer {
+        background: #080808;
+        padding: 60px 20px 20px 20px;
+        position: relative;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        color: white;
+        overflow: hidden;
+    }
+
+    .footer-glow {
+        position: absolute;
+        top: 0; left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e50914, transparent);
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .footer-brand h4 { font-size: 1.5rem; margin-bottom: 10px; color: #e50914; }
+    .footer-brand p { color: #888; font-size: 0.9rem; }
+
+    .footer-info { display: grid; gap: 15px; }
+    .info-item { display: flex; align-items: center; gap: 10px; color: #ccc; font-size: 0.9rem; }
+    .info-item span { color: #e50914; }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        color: #555;
+        font-size: 0.8rem;
+    }
+
+    /* --- ESTILOS BOTÓN WHATSAPP --- */
+    .whatsapp-float {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #25d366;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        z-index: 9999;
+        transition: all 0.3s ease;
+    }
+
+    .whatsapp-float img { width: 32px; height: 32px; }
+
+    .wa-badge {
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        background: #e50914;
+        color: white;
+        font-size: 11px;
+        font-weight: 800;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid #000;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Clase para la rotación y efecto de cambio */
+    .badge-update {
+        transform: scale(1.3) rotate(360deg);
+    }
+
+    .wa-tooltip {
+        position: absolute;
+        right: 75px;
+        background: white;
+        color: black;
+        padding: 8px 15px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .whatsapp-float:hover .wa-tooltip { opacity: 1; visibility: visible; right: 80px; }
+
+    @media (max-width: 600px) {
+        .whatsapp-float { bottom: 20px; right: 20px; }
+        .footer-content { flex-direction: column; text-align: center; align-items: center; }
+    }
+</style>
+
+<script>
+    const waCounter = document.getElementById('waCounter');
+    
+    // 1. Recuperar estado: si no existe, empezamos en un número aleatorio bajo (1-3)
+    let count = parseInt(localStorage.getItem('wa_messages_v2')) || Math.floor(Math.random() * 3) + 1;
+    waCounter.innerText = count;
+
+    function updateHumanBehavior() {
+        const previousCount = count;
+        const actionRand = Math.random();
+        
+        // Lógica de comportamiento:
+        // - Si está en 10: solo puede bajar o quedarse igual.
+        // - Si está en 1: solo puede subir o quedarse igual.
+        if (count >= 10) {
+            count -= Math.floor(Math.random() * 2) + 1; // Baja 1 o 2
+        } else if (count <= 1) {
+            count += Math.floor(Math.random() * 2) + 1; // Sube 1 o 2
+        } else {
+            // Comportamiento intermedio: 50% sube, 30% baja, 20% para
+            if (actionRand > 0.5) count++;
+            else if (actionRand > 0.2) count--;
+        }
+
+        // Si hubo cambio, aplicar efecto estético
+        if (count !== previousCount) {
+            waCounter.classList.add('badge-update');
+            
+            setTimeout(() => {
+                waCounter.innerText = count;
+                localStorage.setItem('wa_messages_v2', count);
+            }, 200);
+
+            setTimeout(() => {
+                waCounter.classList.remove('badge-update');
+            }, 600);
+        }
+
+        // Intervalo "Humano": tiempos de espera irregulares (entre 8s y 25s)
+        const nextTick = Math.floor(Math.random() * 17000) + 8000;
+        setTimeout(updateHumanBehavior, nextTick);
+    }
+
+    // Iniciar con un retraso inicial para no saturar al entrar
+    setTimeout(updateHumanBehavior, 10000);
+</script>
+
+</body>
+</html>
